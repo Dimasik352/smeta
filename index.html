@@ -3,157 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Электромонтаж - Смета (Drag-n-Drop)</title>
-    <!-- Подключаем библиотеку для перетаскивания на телефонах -->
-    <script src="https://jsdelivr.net"></script>
+    <title>Электромонтаж - Прайс-лист Ижевск</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 15px; color: #333; background: #f0f2f5; padding-bottom: 100px; }
-        .report-card { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        /* Оптимизация для мобильных: предотвращаем зум полей */
+        input, select, textarea { font-size: 16px !important; }
         
-        .tabs-nav { display: flex; gap: 8px; margin-bottom: 15px; background: #eee; padding: 4px; border-radius: 8px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: bold; border-radius: 6px; transition: 0.2s; font-size: 13px; }
-        .tab-btn.active { background: #2c3e50; color: white; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 10px; color: #333; background: #f0f2f5; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
+        .report-card { max-width: 900px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); position: relative; }
         
-        .header { border-bottom: 3px solid #2c3e50; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .tabs-nav { display: flex; gap: 5px; margin-bottom: 15px; background: #eee; padding: 4px; border-radius: 8px; }
+        .tab-btn { flex: 1; padding: 12px 5px; border: none; background: transparent; cursor: pointer; font-weight: bold; border-radius: 6px; transition: 0.2s; color: #555; font-size: 12px; text-transform: uppercase; }
+        .tab-btn.active { background: #2c3e50; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .header { border-bottom: 3px solid #2c3e50; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px; }
         .header h1 { margin: 0; font-size: 18px; color: #2c3e50; text-transform: uppercase; }
         
-        .client-block { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px; }
+        .master-info { text-align: right; font-size: 12px; color: #2c3e50; flex-grow: 1; }
+        .master-info input { border: none; background: transparent; text-align: right; font-family: inherit; color: #2c3e50; width: 100%; max-width: 220px; border-bottom: 1px solid transparent; padding: 2px 0; }
+        .master-info input:focus { border-bottom: 1px solid #3498db; outline: none; background: #fdfdfd; }
+        .master-info b { font-size: 11px; color: #7f8c8d; text-transform: uppercase; }
+
+        .client-block { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px; }
         .client-block label { font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; }
-        .client-block input { border: none; background: transparent; font-size: 14px; width: 100%; border-bottom: 1px solid #ddd; }
-
-        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        th { background: #f4f6f8; padding: 10px 5px; text-align: left; font-size: 10px; border-bottom: 2px solid #2c3e50; }
-        td { border-bottom: 1px solid #eee; padding: 8px 5px; font-size: 12px; position: relative; }
+        .client-block input { border: none; background: transparent; font-size: 14px; width: 100%; border-bottom: 1px solid #ddd; padding: 5px 0; }
         
-        /* Стили для перетаскивания */
-        .drag-handler { cursor: grab; color: #3498db; padding-right: 10px; font-size: 20px; user-select: none; display: inline-block; }
-        .dragging { background: #e3f2fd !important; opacity: 0.5; }
-
-        .cat-row { background: #f1f1f1 !important; font-weight: bold; }
-        .input-name { width: 80%; border: none; background: transparent; font-size: 12px; }
-        .input-qty, .input-price { width: 50px; border: 1px dashed #ccc; text-align: center; border-radius: 4px; }
+        .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; min-width: 500px; }
+        th { background: #f4f6f8; color: #333; padding: 10px 5px; text-align: left; font-size: 10px; border-bottom: 2px solid #2c3e50; text-transform: uppercase; }
+        td { border-bottom: 1px solid #eee; padding: 8px 5px; font-size: 13px; position: relative; }
         
-        .total-box { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; text-align: right; margin-top: 20px; }
-        .total-box span { font-size: 24px; color: #2ecc71; font-weight: bold; }
+        .drag-handler { cursor: grab; color: #ccc; padding: 0 5px; font-size: 20px; user-select: none; display: inline-block; }
+        tr.dragging { opacity: 0.5; background: #f0f7ff; }
 
-        .action-btns { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn { padding: 10px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; }
-        .btn-add { background: #3498db; }
-        .btn-cat { background: #95a5a6; }
-        .btn-print { background: #2ecc71; width: 100%; font-size: 18px; margin-top: 10px; }
-
+        .cat-row { background: #f9f9f9; font-weight: bold; color: #2c3e50; }
+        .cat-input { width: 100%; border: none; background: transparent; font-weight: bold; font-family: inherit; color: #2c3e50; font-size: 14px; }
+        
+        .input-qty { width: 40px; border: 1px dashed #3498db; padding: 6px 2px; border-radius: 4px; text-align: center; font-weight: bold; }
+        .input-price, .input-custom { width: 60px; border: none; border-bottom: 1px dotted #ccc; text-align: right; background: transparent; padding: 4px 0; }
+        .input-name { width: 90%; border: none; border-bottom: 1px solid #eee; font-family: inherit; }
+        .input-art { width: 90%; border: none; border-bottom: 1px dotted #ddd; font-family: inherit; font-size: 11px; color: #7f8c8d; }
+        
+        .sticky-summary { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .summary-item { font-size: 13px; }
+        .summary-item b { color: #2ecc71; font-size: 15px; }
+        .grand-total { grid-column: span 2; border-top: 1px solid #444; padding-top: 10px; font-size: 16px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .grand-total span { color: #2ecc71; font-size: 24px; }
+        
+        .action-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .btn { padding: 12px 15px; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; flex-grow: 1; }
+        .btn-add { background: #3498db; color: white; }
+        .btn-cat { background: #95a5a6; color: white; }
+        .btn-reset { background: #e74c3c; color: white; }
+        .btn-print-main { background: #2ecc71; color: white; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; font-size: 18px; margin-top: 20px; }
+        
         @media print {
-            .tabs-nav, .action-btns, .drag-handler, .btn-print, input { display: none !important; }
-            .qty-text, .price-text, .name-text { display: inline !important; font-weight: bold; }
-            .report-card { box-shadow: none; padding: 0; }
+            body { background: white; padding: 0; }
+            .report-card { box-shadow: none; max-width: 100%; padding: 0; }
+            .tabs-nav, .action-btns, .drag-handler, .input-qty, .input-price, .input-custom, .input-name, .input-art, .cat-input, .discount-select, .btn-print-main, .print-options, .unit-inp { display: none !important; }
+            .tab-content { display: none !important; }
+            .tab-content.active { display: block !important; }
+            .qty-text, .price-text, .name-text, .art-text, .cat-text, .unit-text { display: inline !important; font-weight: bold; }
+            .master-info input { display: none; }
+            .master-text { display: block !important; font-weight: bold; }
+            tr.zero-row { display: none !important; }
+            .sticky-summary { position: relative; background: #f8f9fa !important; color: #333 !important; border: 2px solid #2c3e50; margin: 20px 0; }
+            .summary-item b, .grand-total span { color: #000 !important; }
         }
-        .qty-text, .price-text, .name-text { display: none; }
+        .qty-text, .price-text, .name-text, .art-text, .cat-text, .unit-text, .master-text { display: none; }
     </style>
 </head>
 <body>
 
 <div class="report-card">
-    <div class="header">
-        <h1>Смета электромонтажа</h1>
-        <div style="font-size: 12px;">Ижевск / Удмуртия</div>
+    <div class="tabs-nav">
+        <button id="tab-btn-works" class="tab-btn active" onclick="showTab('works')">1. РАБОТЫ</button>
+        <button id="tab-btn-mats" class="tab-btn" onclick="showTab('mats')">2. МАТЕРИАЛЫ</button>
     </div>
 
-    <div class="client-block">
-        <div><label>Заказчик</label><input type="text" placeholder="ФИО"></div>
-        <div><label>Объект</label><input type="text" placeholder="Адрес"></div>
+    <!-- РАБОТЫ -->
+    <div id="tab-works" class="tab-content active">
+        <div class="header">
+            <div><h1>ПРАЙС-ЛИСТ</h1><div style="color: #3498db; font-weight: bold; font-size: 11px;">ИЖЕВСК / УДМУРТИЯ</div></div>
+            <div class="master-info">
+                <b>Исполнитель:</b><br>
+                <input type="text" id="master-name" placeholder="ФИО мастера" class="save-val"><span class="master-text"></span><br>
+                <b>Тел:</b><br>
+                <input type="text" id="master-phone" placeholder="+7 (___) ___-__-__" class="save-val"><span class="master-text"></span>
+            </div>
+        </div>
+        
+        <div class="client-block">
+            <div><label>Заказчик</label><input type="text" id="client-name" placeholder="ФИО" class="save-val"></div>
+            <div><label>Телефон</label><input type="text" id="phone" value="+7 " class="save-val"></div>
+            <div style="grid-column: span 2;"><label>Адрес объекта</label><input type="text" id="address" placeholder="Укажите адрес" class="save-val"></div>
+        </div>
+
+        <div class="table-wrap">
+            <table id="table-works">
+                <thead><tr><th style="width: 45%;">Наименование работ</th><th style="width: 15%;">Ед.</th><th style="width: 15%;">Цена</th><th style="width: 10%;">Кол.</th><th style="width: 15%;">Сумма</th></tr></thead>
+                <tbody id="works-body"></tbody>
+            </table>
+        </div>
+
+        <div class="action-btns">
+            <button class="btn btn-add" onclick="addRow('works-body')">+ Работа</button>
+            <button class="btn btn-cat" onclick="addCategory()">+ Категория</button>
+            <button class="btn btn-reset" onclick="resetData()">Сбросить всё</button>
+        </div>
     </div>
 
-    <div class="action-btns">
-        <button class="btn btn-add" onclick="addRow()">+ Работа</button>
-        <button class="btn btn-cat" onclick="addCategory()">+ Категория</button>
+    <!-- МАТЕРИАЛЫ -->
+    <div id="tab-mats" class="tab-content">
+        <div class="header">
+            <h1 id="mats-title">СПИСОК МАТЕРИАЛОВ</h1>
+            <div class="master-info"><span id="display-master-name"></span><br><span id="display-master-phone"></span></div>
+        </div>
+
+        <div class="table-wrap">
+            <table id="table-mats">
+                <thead><tr><th style="width: 35%;">Наименование</th><th style="width: 20%;">Артикул</th><th style="width: 15%;">Ед.</th><th class="col-price" style="width: 15%;">Цена</th><th style="width: 15%;">Кол.</th></tr></thead>
+                <tbody id="mats-body"></tbody>
+            </table>
+        </div>
+        
+        <div class="action-btns">
+            <button class="btn btn-add" onclick="addRow('mats-body')">+ Материал</button>
+            <button class="btn btn-reset" onclick="resetData()">Очистить</button>
+        </div>
     </div>
 
-    <table id="main-table">
-        <thead>
-            <tr>
-                <th style="width: 50%;">Наименование</th>
-                <th style="width: 15%;">Цена</th>
-                <th style="width: 15%;">Кол.</th>
-                <th style="width: 20%;">Сумма</th>
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            <!-- Начальные строки -->
-            <tr>
-                <td><span class="drag-handler">☰</span><input type="text" class="input-name" value="Штробление бетон"><span class="name-text"></span></td>
-                <td><input type="number" class="input-price" value="550"><span class="price-text"></span></td>
-                <td><input type="number" class="input-qty" value="0"><span class="qty-text"></span></td>
-                <td class="row-total">0 ₽</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="total-box">
-        ИТОГО: <span id="grand-total">0 ₽</span>
+    <div class="sticky-summary">
+        <div class="summary-item">Работы: <b id="res-works">0</b> ₽</div>
+        <div class="summary-item">Скидка: <select id="discount" class="save-val" style="background:transparent; color:white; border:1px solid #555;"><option value="0" style="color:black;">0%</option><option value="5" style="color:black;">5%</option><option value="10" style="color:black;">10%</option></select></div>
+        <div class="summary-item" style="grid-column: span 2;">Материалы: <b id="res-mats">0</b> ₽</div>
+        <div class="grand-total">ИТОГО: <span id="res-total">0 ₽</span></div>
     </div>
-
-    <button class="btn btn-print" onclick="window.print()">Сохранить в PDF</button>
 </div>
 
+<button class="btn-print-main" onclick="window.print()">Сформировать отчет (PDF)</button>
+
 <script>
-    // Инициализация Drag-and-Drop
-    const el = document.getElementById('table-body');
-    new Sortable(el, {
-        handle: '.drag-handler', 
-        animation: 150,
-        ghostClass: 'dragging'
-    });
-
-    // Функция добавления работы
-    function addRow() {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><span class="drag-handler">☰</span><input type="text" class="input-name" placeholder="Новая работа..."><span class="name-text"></span></td>
-            <td><input type="number" class="input-price" value="0"><span class="price-text"></span></td>
-            <td><input type="number" class="input-qty" value="0"><span class="qty-text"></span></td>
-            <td class="row-total">0 ₽</td>
-        `;
-        document.getElementById('table-body').appendChild(row);
-        attachEvents(row);
+    function showTab(name) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        document.getElementById('tab-btn-' + name).classList.add('active');
     }
 
-    // Функция добавления заголовка категории
-    function addCategory() {
-        const row = document.createElement('tr');
-        row.className = 'cat-row';
-        row.innerHTML = `
-            <td colspan="4"><span class="drag-handler">☰</span> <input type="text" class="input-name" value="НОВАЯ КАТЕГОРИЯ" style="font-weight:bold"></td>
-        `;
-        document.getElementById('table-body').appendChild(row);
+    function saveToStorage() {
+        const data = {
+            masterName: document.getElementById('master-name').value,
+            masterPhone: document.getElementById('master-phone').value,
+            client: document.getElementById('client-name').value,
+            phone: document.getElementById('phone').value,
+            address: document.getElementById('address').value,
+            discount: document.getElementById('discount').value,
+            works: Array.from(document.querySelectorAll('#works-body tr')).map(tr => ({
+                type: tr.className,
+                name: tr.querySelector('.input-name')?.value || tr.querySelector('.cat-input')?.value || '',
+                unit: tr.querySelector('.unit-inp')?.value || 'шт.',
+                price: tr.querySelector('.unit-p')?.value || '0',
+                qty: tr.querySelector('.input-qty')?.value || '0'
+            })),
+            mats: Array.from(document.querySelectorAll('#mats-body tr')).map(tr => ({
+                name: tr.querySelector('.input-name')?.value || '',
+                art: tr.querySelector('.input-art')?.value || '',
+                unit: tr.querySelector('.unit-inp')?.value || 'шт.',
+                price: tr.querySelector('.unit-p')?.value || '0',
+                qty: tr.querySelector('.input-qty')?.value || '0'
+            }))
+        };
+        localStorage.setItem('elektro_smart_v20', JSON.stringify(data));
     }
 
-    // Расчет суммы
-    function recalc() {
-        let total = 0;
-        document.querySelectorAll('#table-body tr').forEach(row => {
-            if (row.classList.contains('cat-row')) return;
-            
-            const p = parseFloat(row.querySelector('.input-price').value) || 0;
+    function loadFromStorage() {
+        const stored = JSON.parse(localStorage.getItem('elektro_smart_v20'));
+        if (!stored) { addRow('works-body'); return; }
+        
+        document.getElementById('master-name').value = stored.masterName || '';
+        document.getElementById('master-phone').value = stored.masterPhone || '';
+        document.getElementById('client-name').value = stored.client || '';
+        document.getElementById('phone').value = stored.phone || '+7 ';
+        document.getElementById('address').value = stored.address || '';
+        document.getElementById('discount').value = stored.discount || '0';
+        
+        document.getElementById('works-body').innerHTML = '';
+        document.getElementById('mats-body').innerHTML = '';
+        
+        stored.works.forEach(w => w.type === 'cat-row' ? addCategory(w.name) : addRow('works-body', w));
+        stored.mats.forEach(m => addRow('mats-body', m));
+        calculate();
+    }
+
+    function initRowEvents(row) {
+        row.draggable = true;
+        // Удаление долгим нажатием (для мобильных) или правым кликом
+        row.oncontextmenu = (e) => { e.preventDefault(); if(confirm('Удалить эту строку?')) { row.remove(); calculate(); } };
+        
+        row.addEventListener('dragstart', (e) => { 
+            if(e.target.tagName==='INPUT' || e.target.tagName==='SELECT') e.preventDefault();
+            row.classList.add('dragging'); 
+        });
+        row.addEventListener('dragend', () => { row.classList.remove('dragging'); saveToStorage(); });
+        row.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const draggingRow = document.querySelector('.dragging');
+            if (draggingRow && draggingRow !== row) {
+                const bounding = row.getBoundingClientRect();
+                const offset = e.clientY - bounding.top - bounding.height / 2;
+                row.parentNode.insertBefore(draggingRow, offset > 0 ? row.nextElementSibling : row);
+            }
+        });
+    }
+
+    function addRow(targetId, savedData = null) {
+        const tbody = document.getElementById(targetId);
+        const tr = document.createElement('tr');
+        const isWorks = targetId === 'works-body';
+        tr.className = isWorks ? 'work-row' : 'mat-row';
+        
+        let html = `<td><span class="drag-handler">⠿</span><input type="text" placeholder="Название..." class="input-name" value="${savedData?.name || ''}"><span class="name-text"></span></td>`;
+        if (!isWorks) html += `<td><input type="text" placeholder="Арт." class="input-art" value="${savedData?.art || ''}"><span class="art-text"></span></td>`;
+        
+        html += `<td>
+            <select class="unit-inp" style="width:100%; border:none; border-bottom:1px dotted #ccc; background:transparent;">
+                <option value="шт." ${savedData?.unit === 'шт.' ? 'selected' : ''}>шт.</option>
+                <option value="п.м." ${savedData?.unit === 'п.м.' ? 'selected' : ''}>п.м.</option>
+                <option value="м²" ${savedData?.unit === 'м²' ? 'selected' : ''}>м²</option>
+            </select><span class="unit-text"></span>
+        </td>
+        <td><input type="number" value="${savedData?.price || '0'}" class="input-custom unit-p"><span class="price-text"></span></td>
+        <td><input type="number" value="${savedData?.qty || '0'}" class="input-qty"><span class="qty-text"></span></td>`;
+        
+        if (isWorks) html += `<td style="text-align:right"><span class="row-sum">0</span> ₽</td>`;
+        
+        tr.innerHTML = html;
+        initRowEvents(tr);
+        tbody.appendChild(tr);
+        calculate();
+    }
+
+    function addCategory(val = '') {
+        const tr = document.createElement('tr');
+        tr.className = 'cat-row';
+        tr.innerHTML = `<td colspan="5"><span class="drag-handler">⠿</span><input type="text" placeholder="КАТЕГОРИЯ" class="cat-input" value="${val}"><span class="cat-text"></span></td>`;
+        initRowEvents(tr);
+        document.getElementById('works-body').appendChild(tr);
+        calculate();
+    }
+
+    function calculate() {
+        let wSum = 0, mSum = 0;
+        
+        // Мастер инфо для печати
+        const name = document.getElementById('master-name').value;
+        const phone = document.getElementById('master-phone').value;
+        document.querySelectorAll('.master-text').forEach((el, i) => el.innerText = i === 0 ? name : phone);
+
+        document.querySelectorAll('tr.work-row, tr.mat-row').forEach(row => {
+            const p = parseFloat(row.querySelector('.unit-p').value) || 0;
             const q = parseFloat(row.querySelector('.input-qty').value) || 0;
-            const sum = p * q;
+            const s = p * q;
             
-            row.querySelector('.row-total').innerText = sum.toLocaleString() + ' ₽';
+            if (row.querySelector('.row-sum')) row.querySelector('.row-sum').innerText = s.toLocaleString();
+            
+            // Тексты для печати
+            row.querySelector('.name-text').innerText = row.querySelector('.input-name').value;
+            row.querySelector('.unit-text').innerText = row.querySelector('.unit-inp').value;
             row.querySelector('.price-text').innerText = p;
             row.querySelector('.qty-text').innerText = q;
-            row.querySelector('.name-text').innerText = row.querySelector('.input-name').value;
-            
-            total += sum;
+            if (row.querySelector('.art-text')) row.querySelector('.art-text').innerText = row.querySelector('.input-art').value;
+
+            if (q === 0) row.classList.add('zero-row'); else row.classList.remove('zero-row');
+            if (row.classList.contains('work-row')) wSum += s; else mSum += s;
         });
-        document.getElementById('grand-total').innerText = total.toLocaleString() + ' ₽';
+
+        const disc = parseInt(document.getElementById('discount').value) || 0;
+        const wFinal = Math.round(wSum * (1 - disc/100));
+        
+        document.getElementById('res-works').innerText = wFinal.toLocaleString();
+        document.getElementById('res-mats').innerText = mSum.toLocaleString();
+        document.getElementById('res-total').innerText = (wFinal + mSum).toLocaleString() + ' ₽';
+        
+        saveToStorage();
     }
 
-    function attachEvents(row) {
-        row.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalc));
-    }
+    function resetData() { if(confirm('Удалить все данные?')) { localStorage.removeItem('elektro_smart_v20'); location.reload(); } }
 
-    // Вешаем расчет на существующие строки
-    document.querySelectorAll('#table-body tr').forEach(attachEvents);
+    document.body.addEventListener('input', calculate);
+    document.body.addEventListener('change', calculate);
+    window.onload = loadFromStorage;
 </script>
-
 </body>
 </html>
