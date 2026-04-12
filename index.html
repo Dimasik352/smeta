@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Электромонтаж - Прайс-лист Ижевск</title>
     <style>
-        /* Оптимизация для мобильных: предотвращаем зум полей */
         input, select, textarea { font-size: 16px !important; }
         
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 10px; color: #333; background: #f0f2f5; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
@@ -31,7 +30,7 @@
         .client-block input { border: none; background: transparent; font-size: 14px; width: 100%; border-bottom: 1px solid #ddd; padding: 5px 0; }
         
         .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; min-width: 500px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; min-width: 600px; }
         th { background: #f4f6f8; color: #333; padding: 10px 5px; text-align: left; font-size: 10px; border-bottom: 2px solid #2c3e50; text-transform: uppercase; }
         td { border-bottom: 1px solid #eee; padding: 8px 5px; font-size: 13px; position: relative; }
         
@@ -58,6 +57,10 @@
         .btn-cat { background: #95a5a6; color: white; }
         .btn-reset { background: #e74c3c; color: white; }
         .btn-print-main { background: #2ecc71; color: white; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; font-size: 18px; margin-top: 20px; }
+
+        /* Логика режима закупа */
+        body.mode-purchase .hide-on-purchase { display: none !important; }
+        body.mode-purchase .col-price, body.mode-purchase .col-sum { display: none !important; }
         
         @media print {
             body { background: white; padding: 0; }
@@ -65,7 +68,7 @@
             .tabs-nav, .action-btns, .drag-handler, .input-qty, .input-price, .input-custom, .input-name, .input-art, .cat-input, .discount-select, .btn-print-main, .print-options, .unit-inp { display: none !important; }
             .tab-content { display: none !important; }
             .tab-content.active { display: block !important; }
-            .qty-text, .price-text, .name-text, .art-text, .cat-text, .unit-text { display: inline !important; font-weight: bold; }
+            .qty-text, .price-text, .name-text, .art-text, .cat-text, .unit-text, .row-sum { display: inline !important; font-weight: bold; }
             .master-info input { display: none; }
             .master-text { display: block !important; font-weight: bold; }
             tr.zero-row { display: none !important; }
@@ -103,7 +106,7 @@
 
         <div class="table-wrap">
             <table id="table-works">
-                <thead><tr><th style="width: 45%;">Наименование работ</th><th style="width: 15%;">Ед.</th><th style="width: 15%;">Цена</th><th style="width: 10%;">Кол.</th><th style="width: 15%;">Сумма</th></tr></thead>
+                <thead><tr><th style="width: 40%;">Наименование работ</th><th style="width: 15%;">Ед.</th><th style="width: 15%;">Цена</th><th style="width: 10%;">Кол.</th><th style="width: 20%;">Сумма</th></tr></thead>
                 <tbody id="works-body"></tbody>
             </table>
         </div>
@@ -119,12 +122,18 @@
     <div id="tab-mats" class="tab-content">
         <div class="header">
             <h1 id="mats-title">СПИСОК МАТЕРИАЛОВ</h1>
-            <div class="master-info"><span id="display-master-name"></span><br><span id="display-master-phone"></span></div>
+            <div class="master-info"><span class="master-text"></span><br><span class="master-text"></span></div>
+        </div>
+
+        <div class="print-options" style="background:#fdfdfd; padding:10px; border-radius:8px; border:1px solid #eee; margin-bottom:15px; font-size:12px;">
+            <b>Режим отчета:</b> &nbsp;
+            <label><input type="radio" name="mMode" value="client" checked onclick="setPrintMode('client')"> Для клиента</label> &nbsp;
+            <label><input type="radio" name="mMode" value="purchase" onclick="setPrintMode('purchase')"> Для закупа</label>
         </div>
 
         <div class="table-wrap">
             <table id="table-mats">
-                <thead><tr><th style="width: 35%;">Наименование</th><th style="width: 20%;">Артикул</th><th style="width: 15%;">Ед.</th><th class="col-price" style="width: 15%;">Цена</th><th style="width: 15%;">Кол.</th></tr></thead>
+                <thead><tr><th style="width: 30%;">Наименование</th><th style="width: 20%;">Артикул</th><th style="width: 12%;">Ед.</th><th class="col-price" style="width: 13%;">Цена</th><th style="width: 10%;">Кол.</th><th class="col-sum" style="width: 15%;">Сумма</th></tr></thead>
                 <tbody id="mats-body"></tbody>
             </table>
         </div>
@@ -135,7 +144,7 @@
         </div>
     </div>
 
-    <div class="sticky-summary">
+    <div class="sticky-summary hide-on-purchase">
         <div class="summary-item">Работы: <b id="res-works">0</b> ₽</div>
         <div class="summary-item">Скидка: <select id="discount" class="save-val" style="background:transparent; color:white; border:1px solid #555;"><option value="0" style="color:black;">0%</option><option value="5" style="color:black;">5%</option><option value="10" style="color:black;">10%</option></select></div>
         <div class="summary-item" style="grid-column: span 2;">Материалы: <b id="res-mats">0</b> ₽</div>
@@ -143,7 +152,7 @@
     </div>
 </div>
 
-<button class="btn-print-main" onclick="window.print()">Сформировать отчет (PDF)</button>
+<button class="btn-print-main hide-on-purchase" onclick="window.print()">Сформировать отчет (PDF)</button>
 
 <script>
     function showTab(name) {
@@ -151,6 +160,16 @@
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById('tab-' + name).classList.add('active');
         document.getElementById('tab-btn-' + name).classList.add('active');
+    }
+
+    function setPrintMode(mode) {
+        if(mode === 'purchase') {
+            document.body.classList.add('mode-purchase');
+            document.getElementById('mats-title').innerText = 'ЗАЯВКА НА ЗАКУП МАТЕРИАЛОВ';
+        } else {
+            document.body.classList.remove('mode-purchase');
+            document.getElementById('mats-title').innerText = 'СПИСОК МАТЕРИАЛОВ';
+        }
     }
 
     function saveToStorage() {
@@ -176,11 +195,11 @@
                 qty: tr.querySelector('.input-qty')?.value || '0'
             }))
         };
-        localStorage.setItem('elektro_smart_v20', JSON.stringify(data));
+        localStorage.setItem('elektro_smart_final_v21', JSON.stringify(data));
     }
 
     function loadFromStorage() {
-        const stored = JSON.parse(localStorage.getItem('elektro_smart_v20'));
+        const stored = JSON.parse(localStorage.getItem('elektro_smart_final_v21'));
         if (!stored) { addRow('works-body'); return; }
         
         document.getElementById('master-name').value = stored.masterName || '';
@@ -200,9 +219,7 @@
 
     function initRowEvents(row) {
         row.draggable = true;
-        // Удаление долгим нажатием (для мобильных) или правым кликом
         row.oncontextmenu = (e) => { e.preventDefault(); if(confirm('Удалить эту строку?')) { row.remove(); calculate(); } };
-        
         row.addEventListener('dragstart', (e) => { 
             if(e.target.tagName==='INPUT' || e.target.tagName==='SELECT') e.preventDefault();
             row.classList.add('dragging'); 
@@ -235,10 +252,9 @@
                 <option value="м²" ${savedData?.unit === 'м²' ? 'selected' : ''}>м²</option>
             </select><span class="unit-text"></span>
         </td>
-        <td><input type="number" value="${savedData?.price || '0'}" class="input-custom unit-p"><span class="price-text"></span></td>
-        <td><input type="number" value="${savedData?.qty || '0'}" class="input-qty"><span class="qty-text"></span></td>`;
-        
-        if (isWorks) html += `<td style="text-align:right"><span class="row-sum">0</span> ₽</td>`;
+        <td class="col-price"><input type="number" value="${savedData?.price || '0'}" class="input-custom unit-p"><span class="price-text"></span></td>
+        <td><input type="number" value="${savedData?.qty || '0'}" class="input-qty"><span class="qty-text"></span></td>
+        <td class="col-sum" style="text-align:right"><span class="row-sum">0</span> ₽</td>`;
         
         tr.innerHTML = html;
         initRowEvents(tr);
@@ -249,7 +265,7 @@
     function addCategory(val = '') {
         const tr = document.createElement('tr');
         tr.className = 'cat-row';
-        tr.innerHTML = `<td colspan="5"><span class="drag-handler">⠿</span><input type="text" placeholder="КАТЕГОРИЯ" class="cat-input" value="${val}"><span class="cat-text"></span></td>`;
+        tr.innerHTML = `<td colspan="6"><span class="drag-handler">⠿</span><input type="text" placeholder="КАТЕГОРИЯ" class="cat-input" value="${val}"><span class="cat-text"></span></td>`;
         initRowEvents(tr);
         document.getElementById('works-body').appendChild(tr);
         calculate();
@@ -258,19 +274,17 @@
     function calculate() {
         let wSum = 0, mSum = 0;
         
-        // Мастер инфо для печати
         const name = document.getElementById('master-name').value;
         const phone = document.getElementById('master-phone').value;
-        document.querySelectorAll('.master-text').forEach((el, i) => el.innerText = i === 0 ? name : phone);
+        document.querySelectorAll('.master-text').forEach((el, i) => el.innerText = (i % 2 === 0) ? name : phone);
 
         document.querySelectorAll('tr.work-row, tr.mat-row').forEach(row => {
             const p = parseFloat(row.querySelector('.unit-p').value) || 0;
             const q = parseFloat(row.querySelector('.input-qty').value) || 0;
             const s = p * q;
             
-            if (row.querySelector('.row-sum')) row.querySelector('.row-sum').innerText = s.toLocaleString();
+            row.querySelector('.row-sum').innerText = s.toLocaleString();
             
-            // Тексты для печати
             row.querySelector('.name-text').innerText = row.querySelector('.input-name').value;
             row.querySelector('.unit-text').innerText = row.querySelector('.unit-inp').value;
             row.querySelector('.price-text').innerText = p;
@@ -291,7 +305,7 @@
         saveToStorage();
     }
 
-    function resetData() { if(confirm('Удалить все данные?')) { localStorage.removeItem('elektro_smart_v20'); location.reload(); } }
+    function resetData() { if(confirm('Удалить все данные?')) { localStorage.removeItem('elektro_smart_final_v21'); location.reload(); } }
 
     document.body.addEventListener('input', calculate);
     document.body.addEventListener('change', calculate);
