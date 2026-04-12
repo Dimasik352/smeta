@@ -6,9 +6,8 @@
     <title>Электромонтаж - Прайс-лист Ижевск</title>
     <style>
         input, select, textarea { font-size: 16px !important; }
-        
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 10px; color: #333; background: #f0f2f5; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
-        .report-card { max-width: 900px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); position: relative; }
+        .report-card { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); position: relative; }
         
         .tabs-nav { display: flex; gap: 5px; margin-bottom: 15px; background: #eee; padding: 4px; border-radius: 8px; }
         .tab-btn { flex: 1; padding: 12px 5px; border: none; background: transparent; cursor: pointer; font-weight: bold; border-radius: 6px; transition: 0.2s; color: #555; font-size: 12px; text-transform: uppercase; }
@@ -22,60 +21,52 @@
         
         .master-info { text-align: right; font-size: 12px; color: #2c3e50; flex-grow: 1; }
         .master-info input { border: none; background: transparent; text-align: right; font-family: inherit; color: #2c3e50; width: 100%; max-width: 220px; border-bottom: 1px solid transparent; padding: 2px 0; }
-        .master-info input:focus { border-bottom: 1px solid #3498db; outline: none; background: #fdfdfd; }
-        .master-info b { font-size: 11px; color: #7f8c8d; text-transform: uppercase; }
-
+        
         .client-block { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px; }
         .client-block label { font-weight: bold; color: #666; font-size: 10px; text-transform: uppercase; }
         .client-block input { border: none; background: transparent; font-size: 14px; width: 100%; border-bottom: 1px solid #ddd; padding: 5px 0; }
         
         .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; min-width: 600px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; min-width: 650px; }
         th { background: #f4f6f8; color: #333; padding: 10px 5px; text-align: left; font-size: 10px; border-bottom: 2px solid #2c3e50; text-transform: uppercase; }
         td { border-bottom: 1px solid #eee; padding: 8px 5px; font-size: 13px; position: relative; }
         
-        .drag-handler { cursor: grab; color: #ccc; padding: 0 5px; font-size: 20px; user-select: none; display: inline-block; }
-        tr.dragging { opacity: 0.5; background: #f0f7ff; }
-
         .cat-row { background: #f9f9f9; font-weight: bold; color: #2c3e50; }
-        .cat-input { width: 100%; border: none; background: transparent; font-weight: bold; font-family: inherit; color: #2c3e50; font-size: 14px; }
+        .cat-input { width: 85%; border: none; background: transparent; font-weight: bold; font-size: 14px; }
         
-        .input-qty { width: 40px; border: 1px dashed #3498db; padding: 6px 2px; border-radius: 4px; text-align: center; font-weight: bold; }
-        .input-price, .input-custom { width: 60px; border: none; border-bottom: 1px dotted #ccc; text-align: right; background: transparent; padding: 4px 0; }
-        .input-name { width: 90%; border: none; border-bottom: 1px solid #eee; font-family: inherit; }
-        .input-art { width: 90%; border: none; border-bottom: 1px dotted #ddd; font-family: inherit; font-size: 11px; color: #7f8c8d; }
+        .input-qty { width: 45px; border: 1px dashed #3498db; padding: 4px; border-radius: 4px; text-align: center; }
+        .input-custom { width: 60px; border: none; border-bottom: 1px dotted #ccc; text-align: right; background: transparent; }
+        .input-name { width: 95%; border: none; border-bottom: 1px solid #eee; background: transparent; }
+        .input-art { width: 95%; border: none; border-bottom: 1px dotted #ccc; font-size: 12px; color: #555; }
         
+        .btn-del { color: #e74c3c; cursor: pointer; font-weight: bold; font-size: 18px; border: none; background: none; opacity: 0.3; }
+        .btn-del:hover { opacity: 1; }
+
         .sticky-summary { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .summary-item { font-size: 13px; }
-        .summary-item b { color: #2ecc71; font-size: 15px; }
         .grand-total { grid-column: span 2; border-top: 1px solid #444; padding-top: 10px; font-size: 16px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         .grand-total span { color: #2ecc71; font-size: 24px; }
         
         .action-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
-        .btn { padding: 12px 15px; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; flex-grow: 1; }
-        .btn-add { background: #3498db; color: white; }
-        .btn-cat { background: #95a5a6; color: white; }
-        .btn-reset { background: #e74c3c; color: white; }
-        .btn-print-main { background: #2ecc71; color: white; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; font-size: 18px; margin-top: 20px; }
-
-        /* Логика режима закупа */
-        body.mode-purchase .hide-on-purchase { display: none !important; }
-        body.mode-purchase .col-price, body.mode-purchase .col-sum { display: none !important; }
+        .btn { padding: 10px 15px; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; flex-grow: 1; color: white; }
+        .btn-add { background: #3498db; }
+        .btn-cat { background: #95a5a6; }
+        .btn-reset { background: #e74c3c; }
+        .btn-print-main { background: #2ecc71; color: white; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; font-size: 18px; margin-top: 20px; border: none; cursor: pointer; }
         
-        @media print {
-            body { background: white; padding: 0; }
-            .report-card { box-shadow: none; max-width: 100%; padding: 0; }
-            .tabs-nav, .action-btns, .drag-handler, .input-qty, .input-price, .input-custom, .input-name, .input-art, .cat-input, .discount-select, .btn-print-main, .print-options, .unit-inp { display: none !important; }
-            .tab-content { display: none !important; }
-            .tab-content.active { display: block !important; }
-            .qty-text, .price-text, .name-text, .art-text, .cat-text, .unit-text, .row-sum { display: inline !important; font-weight: bold; }
-            .master-info input { display: none; }
-            .master-text { display: block !important; font-weight: bold; }
-            tr.zero-row { display: none !important; }
-            .sticky-summary { position: relative; background: #f8f9fa !important; color: #333 !important; border: 2px solid #2c3e50; margin: 20px 0; }
-            .summary-item b, .grand-total span { color: #000 !important; }
-        }
+        body.mode-purchase .col-price, 
+        body.mode-purchase .col-sum,
+        body.mode-purchase .hide-on-purchase { display: none !important; }
+        
         .qty-text, .price-text, .name-text, .art-text, .cat-text, .unit-text, .master-text { display: none; }
+
+        @media print {
+            .tabs-nav, .action-btns, .btn-del, input, select, .btn-print-main, .print-options { display: none !important; }
+            .qty-text, .price-text, .name-text, .art-text, .cat-text, .unit-text, .row-sum, .master-text { display: inline !important; font-weight: bold; }
+            tr.zero-row { display: none !important; }
+            .sticky-summary { position: relative; background: white !important; color: black !important; border: 2px solid #2c3e50; }
+            .grand-total span { color: black !important; }
+            .report-card { box-shadow: none; padding: 0; }
+        }
     </style>
 </head>
 <body>
@@ -92,25 +83,24 @@
             <div><h1>ПРАЙС-ЛИСТ</h1><div style="color: #3498db; font-weight: bold; font-size: 11px;">ИЖЕВСК / УДМУРТИЯ</div></div>
             <div class="master-info">
                 <b>Исполнитель:</b><br>
-                <input type="text" id="master-name" placeholder="ФИО мастера" class="save-val"><span class="master-text"></span><br>
+                <input type="text" id="master-name" placeholder="ФИО мастера"><span class="master-text"></span><br>
                 <b>Тел:</b><br>
-                <input type="text" id="master-phone" placeholder="+7 (___) ___-__-__" class="save-val"><span class="master-text"></span>
+                <input type="text" id="master-phone" placeholder="+7 (___) ___-__-__"><span class="master-text"></span>
             </div>
         </div>
-        
         <div class="client-block">
-            <div><label>Заказчик</label><input type="text" id="client-name" placeholder="ФИО" class="save-val"></div>
-            <div><label>Телефон</label><input type="text" id="phone" value="+7 " class="save-val"></div>
-            <div style="grid-column: span 2;"><label>Адрес объекта</label><input type="text" id="address" placeholder="Укажите адрес" class="save-val"></div>
+            <div><label>Заказчик</label><input type="text" id="client-name" placeholder="ФИО"></div>
+            <div><label>Телефон</label><input type="text" id="phone" value="+7 "></div>
+            <div style="grid-column: span 2;"><label>Адрес объекта</label><input type="text" id="address" placeholder="Укажите адрес"></div>
         </div>
-
         <div class="table-wrap">
             <table id="table-works">
-                <thead><tr><th style="width: 40%;">Наименование работ</th><th style="width: 15%;">Ед.</th><th style="width: 15%;">Цена</th><th style="width: 10%;">Кол.</th><th style="width: 20%;">Сумма</th></tr></thead>
+                <thead>
+                    <tr><th style="width: 38%;">Наименование работ</th><th style="width: 12%;">Ед.</th><th style="width: 15%;">Цена</th><th style="width: 10%;">Кол.</th><th style="width: 20%;">Сумма</th><th style="width: 5%;"></th></tr>
+                </thead>
                 <tbody id="works-body"></tbody>
             </table>
         </div>
-
         <div class="action-btns">
             <button class="btn btn-add" onclick="addRow('works-body')">+ Работа</button>
             <button class="btn btn-cat" onclick="addCategory()">+ Категория</button>
@@ -120,41 +110,178 @@
 
     <!-- МАТЕРИАЛЫ -->
     <div id="tab-mats" class="tab-content">
-        <div class="header">
-            <h1 id="mats-title">СПИСОК МАТЕРИАЛОВ</h1>
-            <div class="master-info"><span class="master-text"></span><br><span class="master-text"></span></div>
-        </div>
-
+        <div class="header"><h1 id="mats-title">СПИСОК МАТЕРИАЛОВ</h1></div>
         <div class="print-options" style="background:#fdfdfd; padding:10px; border-radius:8px; border:1px solid #eee; margin-bottom:15px; font-size:12px;">
             <b>Режим отчета:</b> &nbsp;
             <label><input type="radio" name="mMode" value="client" checked onclick="setPrintMode('client')"> Для клиента</label> &nbsp;
             <label><input type="radio" name="mMode" value="purchase" onclick="setPrintMode('purchase')"> Для закупа</label>
         </div>
-
         <div class="table-wrap">
             <table id="table-mats">
-                <thead><tr><th style="width: 30%;">Наименование</th><th style="width: 20%;">Артикул</th><th style="width: 12%;">Ед.</th><th class="col-price" style="width: 13%;">Цена</th><th style="width: 10%;">Кол.</th><th class="col-sum" style="width: 15%;">Сумма</th></tr></thead>
+                <thead>
+                    <tr><th style="width: 28%;">Наименование</th><th style="width: 20%;">Артикул</th><th style="width: 12%;">Ед.</th><th class="col-price" style="width: 13%;">Цена</th><th style="width: 10%;">Кол.</th><th class="col-sum" style="width: 15%;">Сумма</th><th style="width: 5%;"></th></tr>
+                </thead>
                 <tbody id="mats-body"></tbody>
             </table>
         </div>
-        
         <div class="action-btns">
             <button class="btn btn-add" onclick="addRow('mats-body')">+ Материал</button>
-            <button class="btn btn-reset" onclick="resetData()">Очистить</button>
         </div>
     </div>
 
     <div class="sticky-summary hide-on-purchase">
         <div class="summary-item">Работы: <b id="res-works">0</b> ₽</div>
-        <div class="summary-item">Скидка: <select id="discount" class="save-val" style="background:transparent; color:white; border:1px solid #555;"><option value="0" style="color:black;">0%</option><option value="5" style="color:black;">5%</option><option value="10" style="color:black;">10%</option></select></div>
+        <div class="summary-item">Скидка: 
+            <select id="discount" style="background:transparent; color:white; border:1px solid #555;">
+                <option value="0" style="color:black;">0%</option>
+                <option value="5" style="color:black;">5%</option>
+                <option value="10" style="color:black;">10%</option>
+            </select>
+        </div>
         <div class="summary-item" style="grid-column: span 2;">Материалы: <b id="res-mats">0</b> ₽</div>
         <div class="grand-total">ИТОГО: <span id="res-total">0 ₽</span></div>
     </div>
 </div>
 
-<button class="btn-print-main hide-on-purchase" onclick="window.print()">Сформировать отчет (PDF)</button>
+<div style="max-width: 900px; margin: auto; padding: 0 15px;">
+    <button class="btn-print-main" onclick="window.print()">Сформировать PDF</button>
+</div>
 
 <script>
+    const initialWorks = [
+        { type: "cat", name: "Вызов электрика" },
+        { name: "минимальная сумма заказа", unit: "усл.", price: 1500 },
+        { name: "выезд на объект (с дальнейшим заказом)", unit: "усл.", price: 0 },
+        { name: "выезд на объект (без заказа)", unit: "усл.", price: 1500 },
+        { name: "диагностика неисправности", unit: "усл.", price: 1500 },
+        { type: "cat", name: "Черновой этап" },
+        { name: "Штробление до 20 мм (бетон)", unit: "п.м.", price: 200 },
+        { name: "Штробление до 40 мм (бетон)", unit: "п.м.", price: 250 },
+        { name: "Штробление до 20 мм (кирпич)", unit: "п.м.", price: 150 },
+        { name: "Штробление до 40 мм (кирпич)", unit: "п.м.", price: 200 },
+        { name: "Штробление до 20 мм (гипсолит)", unit: "п.м.", price: 100 },
+        { name: "Штробление до 40 мм (гипсолит)", unit: "п.м.", price: 150 },
+        { name: "выборка отверстия для подрозетника (бетон)", unit: "шт.", price: 400 },
+        { name: "выборка отверстия для подрозетника (кирпич)", unit: "шт.", price: 300 },
+        { name: "выборка отверстия для подрозетника (гипсокартон)", unit: "шт.", price: 200 },
+        { type: "cat", name: "Установка розеток" },
+        { name: "Прокладка кабеля до 4 кв.мм. открыто", unit: "п.м.", price: 150 },
+        { name: "Прокладка кабеля в гофре", unit: "п.м.", price: 250 },
+        { name: "Прокладка кабеля в кабель-канале", unit: "п.м.", price: 250 },
+        { name: "Монтаж на тросе", unit: "п.м.", price: 300 },
+        { type: "cat", name: "Чистовой этап (Установка розеток)" },
+        { name: "Монтаж розетки встроенной", unit: "шт.", price: 250 },
+        { name: "Монтаж розетки наружной бетон/кирпич", unit: "шт.", price: 300 },
+        { name: "Монтаж розетки наружной на дерево/ГКЛ", unit: "шт.", price: 250 },
+        { name: "Монтаж розетки силовой 380В", unit: "шт.", price: 600 },
+        { name: "Монтаж розетки силовой в ЩУ (на дин-рейку)", unit: "шт.", price: 450 },
+        { name: "Установка розетки для электроплиты", unit: "шт.", price: 500 },
+        { name: "Установка розетки Ethernet (компьютерная)", unit: "шт.", price: 350 },
+        { name: "Установка розетки TV (телевизионная)", unit: "шт.", price: 300 },
+        { name: "Установка розетки наружнего исполнения (IP44/IP65)", unit: "шт.", price: 350 },
+	{ type: "cat", name: "Установка выключателей и переключателей" },
+        { name: "Монтаж выключателя 1-клав. наруж. (бетон/кирпич)", unit: "шт.", price: 300 },
+        { name: "Монтаж выключателя 1-клав. наруж. (дерево/ГКЛ)", unit: "шт.", price: 250 },
+        { name: "Монтаж выключателя 2-клав. наруж. (бетон/кирпич)", unit: "шт.", price: 350 },
+        { name: "Монтаж выключателя 2-клав. наруж. (дерево/ГКЛ)", unit: "шт.", price: 300 },
+        { name: "Монтаж переключателя (проходного) 1-клав. наруж.", unit: "шт.", price: 400 },
+        { name: "Монтаж переключателя (проходного) 2-клав. наруж.", unit: "шт.", price: 500 },
+        
+        { name: "Монтаж выключателя 1-клав. внутр.", unit: "шт.", price: 250 },
+        { name: "Монтаж выключателя 2-клав. внутр.", unit: "шт.", price: 300 },
+        { name: "Монтаж переключателя (проходного) 1-клав. внутр.", unit: "шт.", price: 400 },
+        { name: "Монтаж переключателя (проходного) 2-клав. внутр.", unit: "шт.", price: 550 },
+        
+        { name: "Монтаж диммера (регулятор освещения)", unit: "шт.", price: 450 },
+        { name: "Замена выключателя внутр. (демонтаж + монтаж)", unit: "шт.", price: 350 },
+        { type: "cat", name: "Монтаж осветительных приборов" },
+        { name: "Монтаж люстры (стандартное крепление)", unit: "шт.", price: 800 },
+        { name: "Монтаж тяжелой люстры (на анкер)", unit: "шт.", price: 1500 },
+        { name: "Монтаж бра / настенного светильника", unit: "шт.", price: 500 },
+        { name: "Монтаж точечного светильника (в готовое отверстие)", unit: "шт.", price: 250 },
+        { name: "Монтаж светодиодной ленты (одноцветная)", unit: "п.м.", price: 300 },
+        { name: "Монтаж светодиодной ленты RGB (многоцветная)", unit: "п.м.", price: 450 },
+        { name: "Монтаж профиля для светодиодной ленты", unit: "п.м.", price: 250 },
+        { name: "Установка и подключение блока питания (драйвера)", unit: "шт.", price: 400 },
+        { name: "Монтаж уличного прожектора на высоте до 3м", unit: "шт.", price: 800 },
+        { name: "Монтаж светильника типа «Армстронг»", unit: "шт.", price: 450 },
+        { name: "Замена патрона в светильнике", unit: "шт.", price: 200 },
+        { type: "cat", name: "Распределительные коробки" },
+        { name: "Монтаж распред. коробки наруж. (бетон/кирпич)", unit: "шт.", price: 350 },
+        { name: "Монтаж распред. коробки наруж. (дерево/ГКЛ/гипсолит)", unit: "шт.", price: 250 },
+        { name: "Монтаж распред. коробки скрытой (в готовое отверстие)", unit: "шт.", price: 300 },
+        { name: "Расключение проводов в коробке (скрутка/WAGO/сварка)", unit: "шт.", price: 450 },
+        { name: "Ревизия / переборка старой распред. коробки", unit: "шт.", price: 600 },
+        { type: "cat", name: "Электрощиты (Монтаж и сборка)" },
+        { name: "Монтаж щита навесного (пластик) до 12 мод.", unit: "шт.", price: 800 },
+        { name: "Монтаж щита навесного (металл/пластик) до 24 мод.", unit: "шт.", price: 1200 },
+        { name: "Монтаж щита встраиваемого (ниша в кирпиче/ГКЛ)", unit: "шт.", price: 1500 },
+        { name: "Монтаж щита встраиваемого (ниша в бетоне)", unit: "шт.", price: 2500 },
+        
+        { type: "cat", name: "Начинка щита (Коммутация)" },
+        { name: "Установка 1-полюсного автомата", unit: "шт.", price: 300 },
+        { name: "Установка 2-х или 3-х полюсного автомата", unit: "шт.", price: 450 },
+        { name: "Установка УЗО / Диф-автомата (2-полюса)", unit: "шт.", price: 500 },
+        { name: "Установка Диф-автомата (4-полюса)", unit: "шт.", price: 700 },
+        { name: "Установка реле напряжения / вольтметра", unit: "шт.", price: 600 },
+        { name: "Установка шины (нулевой/заземления) на DIN-рейку", unit: "шт.", price: 250 },
+        { name: "Маркировка щита (наклейки/подписи)", unit: "шт.", price: 300 },
+        { name: "Пусконаладочные работы (проверка линий под нагрузкой)", unit: "усл.", price: 1000 },
+       
+	{ type: "cat", name: "Подключение оборудования" },
+        { name: "Подключение варочной панели (прямое)", unit: "шт.", price: 1000 },
+        { name: "Подключение духового шкафа", unit: "шт.", price: 800 },
+        { name: "Подключение вытяжки (электрическая часть)", unit: "шт.", price: 500 },
+        { name: "Подключение проточного водонагревателя", unit: "шт.", price: 1200 },
+        { name: "Подключение накопительного бойлера", unit: "шт.", price: 800 },
+        { name: "Подключение электрического полотенцесушителя", unit: "шт.", price: 600 },
+        { name: "Подключение теплого пола к терморегулятору", unit: "шт.", price: 700 },
+        { name: "Монтаж и подключение вентилятора в санузле", unit: "шт.", price: 500 },
+        { name: "Подключение видеодомофона / электрозамка", unit: "шт.", price: 1500 },
+        { name: "Монтаж датчика движения / фотореле", unit: "шт.", price: 600 },
+        { name: "Подключение кондиционера (питание к внешнему блоку)", unit: "шт.", price: 1000 },
+        { name: "Подключение стабилизатора напряжения (однофазный)", unit: "шт.", price: 1500 }
+    ];
+
+        const initialMats = [
+        // КАБЕЛЬ И ПРОВОД
+        { name: "Кабель ВВГнг-LS 3х1.5 (ГОСТ)", art: "CBL-1.5", unit: "п.м.", price: 65 },
+        { name: "Кабель ВВГнг-LS 3х2.5 (ГОСТ)", art: "CBL-2.5", unit: "п.м.", price: 105 },
+        { name: "Кабель ВВГнг-LS 3х4.0 (ГОСТ)", art: "CBL-4.0", unit: "п.м.", price: 160 },
+        { name: "Кабель ВВГнг-LS 3х6.0 (ГОСТ)", art: "CBL-6.0", unit: "п.м.", price: 240 },
+        { name: "Провод ПВС 3х2.5", art: "PVS-2.5", unit: "п.м.", price: 95 },
+        { name: "Кабель интернет (UTP 5e 4 пары)", art: "LAN-5e", unit: "п.м.", price: 45 },
+        { name: "Кабель коаксиальный (TV) RG-6", art: "TV-RG6", unit: "п.м.", price: 40 },
+
+        // РАСХОДНИКИ ДЛЯ МОНТАЖА
+        { name: "Гофра ПВХ d20 с протяжкой", art: "GFR-20", unit: "п.м.", price: 15 },
+        { name: "Гофра ПВХ d25 с протяжкой", art: "GFR-25", unit: "п.м.", price: 22 },
+        { name: "Клипса для гофры d20", art: "CLP-20", unit: "шт.", price: 3 },
+        { name: "Подрозетник для бетона/кирпича 68мм", art: "PDR-B", unit: "шт.", price: 45 },
+        { name: "Подрозетник для ГКЛ (с лапками) 68мм", art: "PDR-G", unit: "шт.", price: 55 },
+        { name: "Коробка распределительная 80х80 (наруж.)", art: "KR-80", unit: "шт.", price: 90 },
+        { name: "Дюбель-хомут (клипса) 5-10 мм", art: "DH-10", unit: "уп.", price: 150 },
+        { name: "Клемма WAGO 221-412 (2 провода)", art: "WAG-2", unit: "шт.", price: 25 },
+        { name: "Клемма WAGO 221-413 (3 провода)", art: "WAG-3", unit: "шт.", price: 35 },
+        { name: "Изолента ПВХ (черная/синяя)", art: "IZL", unit: "шт.", price: 80 },
+
+        // ЩИТОВОЕ ОБОРУДОВАНИЕ
+        { name: "Автоматический выключатель 1Р 16А (B/C)", art: "AVT-16", unit: "шт.", price: 350 },
+        { name: "Автоматический выключатель 1Р 25А (B/C)", art: "AVT-25", unit: "шт.", price: 380 },
+        { name: "УЗО 2Р 40А 30мА (тип А/АС)", art: "UZO-40", unit: "шт.", price: 2800 },
+        { name: "Диф. автомат 16А 30мА", art: "DIF-16", unit: "шт.", price: 3200 },
+        { name: "Реле напряжения (РКН)", art: "RKN", unit: "шт.", price: 4500 },
+        { name: "Шина гребенчатая (PIN) 1Р", art: "SHN", unit: "шт.", price: 600 },
+        { name: "Щит пластиковый навесной на 12 мод.", art: "SHT-12", unit: "шт.", price: 1200 },
+        { name: "Щит встраиваемый металл на 24 мод.", art: "SHT-24", unit: "шт.", price: 3500 },
+
+        // ЧИСТОВАЯ ЭЛЕКТРИКА (База)
+        { name: "Механизм розетки с з/к (белый)", art: "RZ-W", unit: "шт.", price: 350 },
+        { name: "Механизм выключателя 1-клав (белый)", art: "VK-W", unit: "шт.", price: 320 },
+        { name: "Рамка 2-постовая (белая)", art: "RM-2", unit: "шт.", price: 150 },
+        { name: "Рамка 3-постовая (белая)", art: "RM-3", unit: "шт.", price: 220 }
+    ];
+
     function showTab(name) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -163,23 +290,99 @@
     }
 
     function setPrintMode(mode) {
-        if(mode === 'purchase') {
-            document.body.classList.add('mode-purchase');
-            document.getElementById('mats-title').innerText = 'ЗАЯВКА НА ЗАКУП МАТЕРИАЛОВ';
-        } else {
-            document.body.classList.remove('mode-purchase');
-            document.getElementById('mats-title').innerText = 'СПИСОК МАТЕРИАЛОВ';
+        document.body.classList.toggle('mode-purchase', mode === 'purchase');
+        document.getElementById('mats-title').innerText = mode === 'purchase' ? 'ЗАЯВКА НА ЗАКУП МАТЕРИАЛОВ' : 'СПИСОК МАТЕРИАЛОВ';
+    }
+
+    function addRow(targetId, savedData = null) {
+        const tbody = document.getElementById(targetId);
+        const tr = document.createElement('tr');
+        const isWorks = targetId === 'works-body';
+        tr.className = isWorks ? 'work-row' : 'mat-row';
+        
+        let html = `<td><input type="text" class="input-name" value="${savedData?.name || ''}"><span class="name-text"></span></td>`;
+        
+        if (!isWorks) {
+            html += `<td><input type="text" class="input-art" value="${savedData?.art || ''}"><span class="art-text"></span></td>`;
         }
+        
+        html += `<td>
+            <select class="unit-inp" style="width:100%; border:none; background:transparent;">
+                <option value="шт." ${savedData?.unit === 'шт.' ? 'selected' : ''}>шт.</option>
+                <option value="п.м." ${savedData?.unit === 'п.м.' ? 'selected' : ''}>п.м.</option>
+                <option value="усл." ${savedData?.unit === 'усл.' ? 'selected' : ''}>усл.</option>
+                <option value="уп." ${savedData?.unit === 'уп.' ? 'selected' : ''}>уп.</option>
+            </select><span class="unit-text"></span>
+        </td>
+        <td class="col-price"><input type="number" value="${savedData?.price || '0'}" class="input-custom unit-p"><span class="price-text"></span></td>
+        <td><input type="number" value="${savedData?.qty || '0'}" class="input-qty"><span class="qty-text"></span></td>
+        <td class="col-sum" style="text-align:right"><span class="row-sum">0</span> ₽</td>
+        <td><button class="btn-del" onclick="this.closest('tr').remove(); calculate();">×</button></td>`;
+        
+        tr.innerHTML = html;
+        tbody.appendChild(tr);
+        calculate();
+    }
+
+    function addCategory(val = '') {
+        const tr = document.createElement('tr');
+        tr.className = 'cat-row';
+        tr.innerHTML = `<td colspan="5"><input type="text" placeholder="КАТЕГОРИЯ" class="cat-input" value="${val}"><span class="cat-text"></span></td>
+                        <td><button class="btn-del" onclick="this.closest('tr').remove(); calculate();">×</button></td>`;
+        document.getElementById('works-body').appendChild(tr);
+        calculate();
+    }
+
+    function calculate() {
+        let wSum = 0, mSum = 0;
+        
+        // Инфо мастера
+        const masterName = document.getElementById('master-name').value;
+        const masterPhone = document.getElementById('master-phone').value;
+        document.querySelectorAll('.master-text').forEach((el, i) => {
+            el.innerText = (i === 0 || i === 2) ? masterName : masterPhone;
+        });
+
+        document.querySelectorAll('tr.work-row, tr.mat-row, tr.cat-row').forEach(row => {
+            if (row.classList.contains('cat-row')) {
+                const inp = row.querySelector('.cat-input');
+                row.querySelector('.cat-text').innerText = inp ? inp.value.toUpperCase() : '';
+                return;
+            }
+
+            const pVal = parseFloat(row.querySelector('.unit-p')?.value) || 0;
+            const qVal = parseFloat(row.querySelector('.input-qty')?.value) || 0;
+            const s = pVal * qVal;
+
+            if(row.querySelector('.row-sum')) row.querySelector('.row-sum').innerText = s.toLocaleString();
+            if(row.querySelector('.name-text')) row.querySelector('.name-text').innerText = row.querySelector('.input-name').value;
+            if(row.querySelector('.unit-text')) row.querySelector('.unit-text').innerText = row.querySelector('.unit-inp').value;
+            if(row.querySelector('.price-text')) row.querySelector('.price-text').innerText = pVal;
+            if(row.querySelector('.qty-text')) row.querySelector('.qty-text').innerText = qVal;
+            
+            const artInp = row.querySelector('.input-art');
+            if(artInp && row.querySelector('.art-text')) row.querySelector('.art-text').innerText = artInp.value;
+
+            if (qVal === 0) row.classList.add('zero-row'); else row.classList.remove('zero-row');
+            
+            if (row.classList.contains('work-row')) wSum += s; else mSum += s;
+        });
+
+        const disc = parseInt(document.getElementById('discount').value) || 0;
+        const wFinal = Math.round(wSum * (1 - disc/100));
+        
+        document.getElementById('res-works').innerText = wFinal.toLocaleString();
+        document.getElementById('res-mats').innerText = mSum.toLocaleString();
+        document.getElementById('res-total').innerText = (wFinal + mSum).toLocaleString() + ' ₽';
+        
+        saveToStorage();
     }
 
     function saveToStorage() {
         const data = {
-            masterName: document.getElementById('master-name').value,
-            masterPhone: document.getElementById('master-phone').value,
-            client: document.getElementById('client-name').value,
-            phone: document.getElementById('phone').value,
-            address: document.getElementById('address').value,
-            discount: document.getElementById('discount').value,
+            mName: document.getElementById('master-name').value,
+            mPhone: document.getElementById('master-phone').value,
+            disc: document.getElementById('discount').value,
             works: Array.from(document.querySelectorAll('#works-body tr')).map(tr => ({
                 type: tr.className,
                 name: tr.querySelector('.input-name')?.value || tr.querySelector('.cat-input')?.value || '',
@@ -195,121 +398,37 @@
                 qty: tr.querySelector('.input-qty')?.value || '0'
             }))
         };
-        localStorage.setItem('elektro_smart_final_v21', JSON.stringify(data));
+        localStorage.setItem('elektro_data_v7', JSON.stringify(data));
     }
 
     function loadFromStorage() {
-        const stored = JSON.parse(localStorage.getItem('elektro_smart_final_v21'));
-        if (!stored) { addRow('works-body'); return; }
-        
-        document.getElementById('master-name').value = stored.masterName || '';
-        document.getElementById('master-phone').value = stored.masterPhone || '';
-        document.getElementById('client-name').value = stored.client || '';
-        document.getElementById('phone').value = stored.phone || '+7 ';
-        document.getElementById('address').value = stored.address || '';
-        document.getElementById('discount').value = stored.discount || '0';
-        
-        document.getElementById('works-body').innerHTML = '';
-        document.getElementById('mats-body').innerHTML = '';
-        
-        stored.works.forEach(w => w.type === 'cat-row' ? addCategory(w.name) : addRow('works-body', w));
-        stored.mats.forEach(m => addRow('mats-body', m));
+        const stored = JSON.parse(localStorage.getItem('elektro_data_v7'));
+        if (stored) {
+            document.getElementById('master-name').value = stored.mName || '';
+            document.getElementById('master-phone').value = stored.mPhone || '';
+            document.getElementById('discount').value = stored.disc || '0';
+            document.getElementById('works-body').innerHTML = '';
+            document.getElementById('mats-body').innerHTML = '';
+            stored.works.forEach(w => w.type === 'cat-row' ? addCategory(w.name) : addRow('works-body', w));
+            stored.mats.forEach(m => addRow('mats-body', m));
+        } else {
+            initialWorks.forEach(w => w.type === 'cat' ? addCategory(w.name) : addRow('works-body', w));
+            initialMats.forEach(m => addRow('mats-body', m));
+        }
         calculate();
     }
 
-    function initRowEvents(row) {
-        row.draggable = true;
-        row.oncontextmenu = (e) => { e.preventDefault(); if(confirm('Удалить эту строку?')) { row.remove(); calculate(); } };
-        row.addEventListener('dragstart', (e) => { 
-            if(e.target.tagName==='INPUT' || e.target.tagName==='SELECT') e.preventDefault();
-            row.classList.add('dragging'); 
-        });
-        row.addEventListener('dragend', () => { row.classList.remove('dragging'); saveToStorage(); });
-        row.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            const draggingRow = document.querySelector('.dragging');
-            if (draggingRow && draggingRow !== row) {
-                const bounding = row.getBoundingClientRect();
-                const offset = e.clientY - bounding.top - bounding.height / 2;
-                row.parentNode.insertBefore(draggingRow, offset > 0 ? row.nextElementSibling : row);
-            }
-        });
+    function resetData() {
+        if(confirm('Сбросить все данные?')) {
+            localStorage.removeItem('elektro_data_v7');
+            location.reload();
+        }
     }
 
-    function addRow(targetId, savedData = null) {
-        const tbody = document.getElementById(targetId);
-        const tr = document.createElement('tr');
-        const isWorks = targetId === 'works-body';
-        tr.className = isWorks ? 'work-row' : 'mat-row';
-        
-        let html = `<td><span class="drag-handler">⠿</span><input type="text" placeholder="Название..." class="input-name" value="${savedData?.name || ''}"><span class="name-text"></span></td>`;
-        if (!isWorks) html += `<td><input type="text" placeholder="Арт." class="input-art" value="${savedData?.art || ''}"><span class="art-text"></span></td>`;
-        
-        html += `<td>
-            <select class="unit-inp" style="width:100%; border:none; border-bottom:1px dotted #ccc; background:transparent;">
-                <option value="шт." ${savedData?.unit === 'шт.' ? 'selected' : ''}>шт.</option>
-                <option value="п.м." ${savedData?.unit === 'п.м.' ? 'selected' : ''}>п.м.</option>
-                <option value="м²" ${savedData?.unit === 'м²' ? 'selected' : ''}>м²</option>
-            </select><span class="unit-text"></span>
-        </td>
-        <td class="col-price"><input type="number" value="${savedData?.price || '0'}" class="input-custom unit-p"><span class="price-text"></span></td>
-        <td><input type="number" value="${savedData?.qty || '0'}" class="input-qty"><span class="qty-text"></span></td>
-        <td class="col-sum" style="text-align:right"><span class="row-sum">0</span> ₽</td>`;
-        
-        tr.innerHTML = html;
-        initRowEvents(tr);
-        tbody.appendChild(tr);
-        calculate();
-    }
-
-    function addCategory(val = '') {
-        const tr = document.createElement('tr');
-        tr.className = 'cat-row';
-        tr.innerHTML = `<td colspan="6"><span class="drag-handler">⠿</span><input type="text" placeholder="КАТЕГОРИЯ" class="cat-input" value="${val}"><span class="cat-text"></span></td>`;
-        initRowEvents(tr);
-        document.getElementById('works-body').appendChild(tr);
-        calculate();
-    }
-
-    function calculate() {
-        let wSum = 0, mSum = 0;
-        
-        const name = document.getElementById('master-name').value;
-        const phone = document.getElementById('master-phone').value;
-        document.querySelectorAll('.master-text').forEach((el, i) => el.innerText = (i % 2 === 0) ? name : phone);
-
-        document.querySelectorAll('tr.work-row, tr.mat-row').forEach(row => {
-            const p = parseFloat(row.querySelector('.unit-p').value) || 0;
-            const q = parseFloat(row.querySelector('.input-qty').value) || 0;
-            const s = p * q;
-            
-            row.querySelector('.row-sum').innerText = s.toLocaleString();
-            
-            row.querySelector('.name-text').innerText = row.querySelector('.input-name').value;
-            row.querySelector('.unit-text').innerText = row.querySelector('.unit-inp').value;
-            row.querySelector('.price-text').innerText = p;
-            row.querySelector('.qty-text').innerText = q;
-            if (row.querySelector('.art-text')) row.querySelector('.art-text').innerText = row.querySelector('.input-art').value;
-
-            if (q === 0) row.classList.add('zero-row'); else row.classList.remove('zero-row');
-            if (row.classList.contains('work-row')) wSum += s; else mSum += s;
-        });
-
-        const disc = parseInt(document.getElementById('discount').value) || 0;
-        const wFinal = Math.round(wSum * (1 - disc/100));
-        
-        document.getElementById('res-works').innerText = wFinal.toLocaleString();
-        document.getElementById('res-mats').innerText = mSum.toLocaleString();
-        document.getElementById('res-total').innerText = (wFinal + mSum).toLocaleString() + ' ₽';
-        
-        saveToStorage();
-    }
-
-    function resetData() { if(confirm('Удалить все данные?')) { localStorage.removeItem('elektro_smart_final_v21'); location.reload(); } }
-
-    document.body.addEventListener('input', calculate);
-    document.body.addEventListener('change', calculate);
-    window.onload = loadFromStorage;
+    window.onload = () => {
+        loadFromStorage();
+        document.body.addEventListener('input', calculate);
+    };
 </script>
 </body>
 </html>
